@@ -1,17 +1,27 @@
-# branch_q
+# BranchQ — Branch Appointments & Live Queue Tokens
 
-A new Flutter project.
+BranchQ is a mobile banking capstone application built with Flutter, Riverpod, and GoRouter. It enables bank customers to locate branches, check service requirements, reserve appointment slots, and track walk-in queue positions in real time.
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+## 1. Problem Statement
 
-A few resources to get you started if this is your first Flutter project:
+Branch visits are still required for safe deposit lockers, demand drafts, KYC updates, and loan servicing. Customers frequently face long, unpredictable wait times without knowing branch congestion or whether the branch is even open. 
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+**Goal:** Provide an easy way to locate branches, check live crowd indicators, book 15-minute appointment slots, and track digital queue tokens with live position updates.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+---
+
+## 2. Architecture
+
+BranchQ follows the 4-layer client architecture specified in the capstone standard:
+
+```text
+lib/
+├── app/               # Router (GoRouter), App entry configuration
+├── core/              # Shared cross-cutting concerns (BankError, AsyncValueView)
+└── features/branch/
+    ├── domain/        # Domain entities (Branch, Service, Slot, LiveToken)
+    ├── data/          # BranchRepository, simulated API calls & 409 conflict rules[cite: 1]
+    ├── state/         # Riverpod providers, StreamProvider for queue polling[cite: 1]
+    └── presentation/   # Screens (Finder, Detail, Slot Booking, Live Token)[cite: 1]
