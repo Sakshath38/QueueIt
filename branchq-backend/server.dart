@@ -48,7 +48,11 @@ final List<Map<String, dynamic>> branches = [
         'id': 's3',
         'name': 'KYC & Re-KYC Update',
         'estimatedMinutes': 20,
-        'requiredDocuments': ['Government ID', 'Address Proof', 'Passport Photo'],
+        'requiredDocuments': [
+          'Government ID',
+          'Address Proof',
+          'Passport Photo'
+        ],
       },
       {
         'id': 's1',
@@ -67,12 +71,14 @@ void sendJson(HttpRequest req, int statusCode, Map<String, dynamic> data) {
     ..headers.contentType = ContentType.json
     ..headers.add('Access-Control-Allow-Origin', '*')
     ..headers.add('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-    ..headers.add('Access-Control-Allow-Headers', 'Origin, Content-Type, Accept, Authorization, Idempotency-Key')
+    ..headers.add('Access-Control-Allow-Headers',
+        'Origin, Content-Type, Accept, Authorization, Idempotency-Key')
     ..write(jsonEncode(data))
     ..close();
 }
 
-void sendBankError(HttpRequest req, int statusCode, String code, String message) {
+void sendBankError(
+    HttpRequest req, int statusCode, String code, String message) {
   final traceId = 'tr_${Random().nextInt(999999)}';
   sendJson(req, statusCode, {
     'error': {
@@ -99,7 +105,8 @@ void main() async {
         ..statusCode = HttpStatus.ok
         ..headers.add('Access-Control-Allow-Origin', '*')
         ..headers.add('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-        ..headers.add('Access-Control-Allow-Headers', 'Origin, Content-Type, Accept, Authorization, Idempotency-Key')
+        ..headers.add('Access-Control-Allow-Headers',
+            'Origin, Content-Type, Accept, Authorization, Idempotency-Key')
         ..close();
       continue;
     }
@@ -114,7 +121,9 @@ void main() async {
     }
 
     // 2. GET /branches/:id
-    if (req.method == 'GET' && segments.length == 2 && segments[0] == 'branches') {
+    if (req.method == 'GET' &&
+        segments.length == 2 &&
+        segments[0] == 'branches') {
       final id = segments[1];
       final match = branches.where((b) => b['id'] == id);
       if (match.isEmpty) {
@@ -126,7 +135,10 @@ void main() async {
     }
 
     // 3. GET /branches/:id/slots
-    if (req.method == 'GET' && segments.length == 3 && segments[0] == 'branches' && segments[2] == 'slots') {
+    if (req.method == 'GET' &&
+        segments.length == 3 &&
+        segments[0] == 'branches' &&
+        segments[2] == 'slots') {
       final branchId = segments[1];
       final date = req.uri.queryParameters['date'] ?? 'Today';
 
@@ -154,7 +166,8 @@ void main() async {
     if (req.method == 'POST' && path == '/appointments') {
       final idempotencyKey = req.headers.value('Idempotency-Key');
       final bodyStr = await utf8.decodeStream(req);
-      final body = bodyStr.isNotEmpty ? jsonDecode(bodyStr) as Map<String, dynamic> : {};
+      final body =
+          bodyStr.isNotEmpty ? jsonDecode(bodyStr) as Map<String, dynamic> : {};
 
       final branchId = body['branchId'] as String?;
       final slotId = body['slotId'] as String?;
@@ -166,7 +179,8 @@ void main() async {
       }
 
       // Check Idempotency Cache
-      if (idempotencyKey != null && idempotencyStore.containsKey(idempotencyKey)) {
+      if (idempotencyKey != null &&
+          idempotencyStore.containsKey(idempotencyKey)) {
         sendJson(req, 200, idempotencyStore[idempotencyKey]!);
         continue;
       }
@@ -176,7 +190,8 @@ void main() async {
 
       // Slot Contention / Conflict check
       if (currentCapacity <= 0) {
-        sendBankError(req, 409, 'SLOT_FULL', 'This slot was just claimed by another user.');
+        sendBankError(req, 409, 'SLOT_FULL',
+            'This slot was just claimed by another user.');
         continue;
       }
 
@@ -204,12 +219,15 @@ void main() async {
     }
 
     // 5. GET /tokens/:id
-    if (req.method == 'GET' && segments.length == 2 && segments[0] == 'tokens') {
+    if (req.method == 'GET' &&
+        segments.length == 2 &&
+        segments[0] == 'tokens') {
       final tokenId = segments[1];
       final token = tokens[tokenId];
 
       if (token == null) {
-        sendBankError(req, 404, 'TOKEN_NOT_FOUND', 'Active token expired or not found.');
+        sendBankError(
+            req, 404, 'TOKEN_NOT_FOUND', 'Active token expired or not found.');
         continue;
       }
 
