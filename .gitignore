@@ -46,3 +46,22 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Flutter & Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+build/
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+
+# Node / Mock server (if inside repo)
+node_modules/
+
+# OS files
+.DS_Store
+Thumbs.db
